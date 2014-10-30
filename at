@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+import argparse
+import os
+import sys
+
+def version(root,args):
+    sys.stderr.write('systemd-at version 0\n')
+    exit(0)
+
+def create(root,args):
+    exit(1)
+
+def batch(root,args):
+    if root:
+        os.system('systemd-run sh -c "echo ROOT ; sleep 100"')
+    else:
+        os.system('systemd-run --user sh -c "echo NOT-ROOT ; sleep 100"')
+
+def list(root,args):
+    os.system('systemctl list-jobs')
+
+def remove(root,args):
+    exit(1)
+
+def cat(root,args):
+    exit(1)
+
+SELF = os.path.basename(sys.argv[0])
+
+description = {
+             'atq': 'examine scheduled jobs',
+             'atrm': 'delete scheduled jobs',
+             'batch': 'start lowest priority job',
+             }.get(SELF, 'queue, examine or delete jobs for later execution')
+
+args_parser = argparse.ArgumentParser(description=description)
+
+args_parser.add_argument('-V', '--version', dest='action', action='store_const', const='version',
+        help='prints the version number to standard error and exit successfully.')
+
+if SELF == 'at':
+    group = args_parser.add_mutually_exclusive_group()
+    group.add_argument('-b', '--batch', dest='action', action='store_const', const='batch', help='is an alias for batch.')
+    group.add_argument('-l', '--list', dest='action', action='store_const', const='list', help='Is an alias for atq.')
+    group.add_argument('-r', '--remove', dest='action', action='store_const', const='remove', help='Is an alias for atrm.')
+    group.add_argument('-d', '--delete', dest='action', action='store_const', const='remove', help='Is an alias for atrm.')
+    group.add_argument('-c', '--cat', dest='action', action='store_const', const='cat',
+            help='cats the jobs listed on the command line to standard output.')
+    args_parser.add_argument('-t', '--time', dest='time', type=str,
+            help='run the job at time, given in the format [[CC]YY]MMDDhhmm[.ss]')
+    args_parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
+            help='Shows the time the job will be executed before reading the job.')
+    args_parser.add_argument('-m', dest='mail', action='store_true', default=None,
+            help='Send mail to the user when the job has completed even if there was no output.')
+    args_parser.add_argument('-M', dest='mail', action='store_false', default=None,
+            help='Never send mail to the user.')
+
+if SELF in ['at', 'batch']:
+   args_parser.add_argument('-f', '--file', dest='file', type=str, default='-',
+           help='Reads the job from file rather than standard input.')
+
+if SELF in ['at', 'atq']:
+   args_parser.add_argument('-q', '--queue', type=str, dest='queue', default='',
+           help='uses the specified queue.')
+
+args = args_parser.parse_args()
+
+root = not os.getuid()
+
+action = {
+         'batch': batch,
+         'atq': list,
+         'atrm': remove
+        }.get(SELF) or {
+        'version': version,
+        'batch': batch,
+        'list': list,
+        'remove': remove,
+        'cat': cat
+        }.get(args.action, create)
+
+action(root,args)

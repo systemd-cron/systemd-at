@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --with python3
+
+override_dh_builddeb:
+	#cd debian/systemd-at/bin/ ; ln -s at batch ; ln -s at atq ; ln -s at atrm
+	dh_builddeb

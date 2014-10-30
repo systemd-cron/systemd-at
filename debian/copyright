@@ -1,0 +1,27 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: https://github.com/systemd-cron/systemd-at.git
+
+Files:*
+Copyright: 2014 Alexandre Detiste <alexandre.detiste@gmail.com>
+License: GPL-2+
+
+Files:at.1
+Copyright: 1993-1997,  Thomas Koenig <ig25@rz.uni-karlsruhe.de>
+           1993,       David Parsons
+           2002, 2005, Ryan Murray <rmurray@debian.org>
+           2014        Alexandre Detiste <alexandre.detiste@gmail.com>
+License: GPL-2+
+
+License: GPL-2+
+ This program is free software; you may redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2, or (at your option)
+ any later version.
+ .
+ This is distributed in the hope that it will be useful, but without
+ any warranty; without even the implied warranty of merchantability or
+ fitness for a particular purpose. See the GNU General Public License
+ for more details.
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".

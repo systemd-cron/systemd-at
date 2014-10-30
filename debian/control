@@ -1,0 +1,15 @@
+Source: systemd-at
+Section: admin
+Priority: extra
+Maintainer: Alexandre Detiste <alexandre.detiste@gmail.com>
+Build-Depends: debhelper (>= 9), dh-python, python3
+Standards-Version: 3.9.6
+Homepage: https://github.com/systemd-cron/systemd-at
+
+Package: systemd-at
+Architecture: all
+Depends: ${misc:Depends}, systemd-sysv (>= 212), ${python3:Depends}
+Provides: at
+Conflicts: at
+Description: wrapper for systemd-run that simulates the at daemon
+ This is a stub
