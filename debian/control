@@ -8,7 +8,7 @@ Homepage: https://github.com/systemd-cron/systemd-at
 
 Package: systemd-at
 Architecture: all
-Depends: ${misc:Depends}, systemd-sysv (>= 212), ${python3:Depends}
+Depends: ${misc:Depends}, systemd-sysv (>= 218), ${python3:Depends}
 Provides: at
 Conflicts: at
 Description: wrapper for systemd-run that simulates the at daemon
