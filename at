@@ -13,19 +13,17 @@ def create(root,args):
     exit(1)
 
 def batch(root,args):
+    job = sys.stdin.read()
     tmp = tempfile.NamedTemporaryFile(mode='w+', encoding='UTF-8', dir=DIR, delete=False)
     tmp.write('#!/bin/sh\n')
-    tmp.write(sys.stdin.read())
+    tmp.write(job)
     tmp.write('\n')
     tmp.write('rm %s\n' % tmp.name)
     tmp.close()
     os.chmod(tmp.name, stat.S_IXUSR | stat.S_IRUSR)
     # IOScheduling=idle
     # CPUSchedulingPolicy=idle
-    if root:
-        os.system('systemd-run --nice 19 %s' % tmp.name)
-    else:
-        os.system('systemd-run --user --nice 19 %s' % tmp.name)
+    os.system('systemd-run %s --nice 19 %s' % (USER_SWITCH, tmp.name))
 
 def list(root,args):
     os.system('systemctl list-jobs')
@@ -40,8 +38,12 @@ SELF = os.path.basename(sys.argv[0])
 
 root = not os.getuid()
 
-if root: DIR = '/var/spool/cron/atjobs/'
-else: DIR = os.path.expanduser('~/.systemd-at/')
+if root:
+    DIR = '/var/spool/cron/atjobs/'
+    USER_SWITCH = ''
+else:
+    DIR = os.path.expanduser('~/.systemd-at/')
+    USER_SWITCH = '--user'
 
 try:
     if not os.path.exists(DIR):
