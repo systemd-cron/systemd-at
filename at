@@ -13,7 +13,10 @@ def create(root,args):
     exit(1)
 
 def batch(root,args):
-    job = sys.stdin.read()
+    try:
+        job = sys.stdin.read()
+    except KeyboardInterrupt:
+        sys.exit('Aborted')
     tmp = tempfile.NamedTemporaryFile(mode='w+', encoding='UTF-8', dir=DIR, delete=False)
     tmp.write('#!/bin/sh\n')
     tmp.write(job)
