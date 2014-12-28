@@ -20,10 +20,12 @@ def batch(root,args):
     tmp.write('rm %s\n' % tmp.name)
     tmp.close()
     os.chmod(tmp.name, stat.S_IXUSR | stat.S_IRUSR)
+    # IOScheduling=idle
+    # CPUSchedulingPolicy=idle
     if root:
-        os.system('systemd-run %s --property=IOScheduling=idle ' % tmp.name)
+        os.system('systemd-run --nice 19 %s' % tmp.name)
     else:
-        os.system('systemd-run --user %s --property=IOScheduling=idle ' % tmp.name)
+        os.system('systemd-run --user --nice 19 %s' % tmp.name)
 
 def list(root,args):
     os.system('systemctl list-jobs')
