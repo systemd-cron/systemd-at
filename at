@@ -2,6 +2,8 @@
 import argparse
 import os
 import sys
+import stat
+import tempfile
 
 def version(root,args):
     sys.stderr.write('systemd-at version 0\n')
@@ -11,10 +13,17 @@ def create(root,args):
     exit(1)
 
 def batch(root,args):
+    tmp = tempfile.NamedTemporaryFile(mode='w+', encoding='UTF-8', dir=DIR, delete=False)
+    tmp.write('#!/bin/sh\n')
+    tmp.write(sys.stdin.read())
+    tmp.write('\n')
+    tmp.write('rm %s\n' % tmp.name)
+    tmp.close()
+    os.chmod(tmp.name, stat.S_IXUSR | stat.S_IRUSR)
     if root:
-        os.system('systemd-run sh -c "echo ROOT ; sleep 100"')
+        os.system('systemd-run %s --property=IOScheduling=idle ' % tmp.name)
     else:
-        os.system('systemd-run --user sh -c "echo NOT-ROOT ; sleep 100"')
+        os.system('systemd-run --user %s --property=IOScheduling=idle ' % tmp.name)
 
 def list(root,args):
     os.system('systemctl list-jobs')
@@ -26,6 +35,18 @@ def cat(root,args):
     exit(1)
 
 SELF = os.path.basename(sys.argv[0])
+
+root = not os.getuid()
+
+if root: DIR = '/var/spool/cron/atjobs/'
+else: DIR = os.path.expanduser('~/.systemd-at/')
+
+try:
+    if not os.path.exists(DIR):
+        os.makedirs(DIR)
+except:
+    sys.exit("%s doesn't exists!" % DIR)
+
 
 description = {
              'atq': 'examine scheduled jobs',
@@ -64,8 +85,6 @@ if SELF in ['at', 'atq']:
            help='uses the specified queue.')
 
 args = args_parser.parse_args()
-
-root = not os.getuid()
 
 action = {
          'batch': batch,
